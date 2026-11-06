@@ -1,0 +1,9 @@
+{
+  "name": "rixifrah",
+  "version": "1.0.0",
+  "description": "Rixifrah · ajedrez en línea",
+  "private": true,
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" }
+}

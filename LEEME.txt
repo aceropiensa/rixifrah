@@ -1,0 +1,26 @@
+RIXIFRAH · AJEDREZ EN LÍNEA
+
+Esta carpeta es un programa completo (servidor + página). No sirve subirla a Netlify
+como sitio estático: necesita un servidor Node.js encendido para conectar a las personas.
+
+Probar en tu computadora
+  1. Instala Node.js (versión 18 o superior).
+  2. En esta carpeta ejecuta:  node server.js
+  3. Abre http://localhost:3000 en dos pestañas (o en dos dispositivos de tu red).
+
+Publicar en internet
+  Sube esta carpeta a un servicio que ejecute Node.js (Render, Railway, Fly.io, etc.).
+  Comando de inicio: npm start      (no hay que instalar nada más: no usa paquetes externos)
+  El servicio te da una dirección https://... y esa es la dirección que compartes.
+
+Notas
+  - Las salas, el chat y las partidas viven en la memoria del servidor: si el servidor se
+    reinicia, se pierden las salas y partidas en curso.
+  - Las cuentas y los puntos todavía se guardan en el navegador de cada persona.
+
+Propaganda (pantalla secreta)
+  - Entra con la cuenta cuyo correo es franzacero@gmail.com y toca la palabra RIXIFRAH del pie de página.
+  - Contraseña por defecto: semilla  (cámbiala con la variable de entorno ADS_PASS).
+  - La propaganda se guarda en el servidor (data/ads.json, o la carpeta DATA_DIR) y la ven todos los jugadores.
+  - En hosting con disco temporal (p. ej. plan gratuito de Render) ese archivo se borra al reiniciar:
+    usa un disco persistente y apunta DATA_DIR a él.
