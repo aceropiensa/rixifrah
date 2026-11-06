@@ -590,6 +590,38 @@ $("#bd").onclick=e=>{const q=e.target.closest(".sq");if(!q||!G||G.over||G.s.turn
 if(G.sel!==null){const ms=G.lm.filter(m=>m.f===G.sel&&(m.t===i||m.castle===i));
 if(ms.length>1){promo(ms);return}if(ms.length===1){move(ms[0]);return}}
 const p=G.s.b[i];G.sel=p&&p[0]===G.me?i:null;render()};
+/* Arrastrar y soltar piezas (mouse y dedo). Tocar pieza y luego casilla sigue funcionando */
+(function(){const bd=$("#bd");bd.style.touchAction="none";let D=null,sup=false;
+const moves=(from,i)=>G.lm.filter(m=>m.f===from&&(m.t===i||m.castle===i));
+function place(x,y){if(D){D.g.style.left=x+"px";D.g.style.top=y+"px"}}
+function stop(){if(!D)return;D.g.remove();const o=$(`.sq[data-i="${D.i}"] .pc`);if(o)o.style.opacity="";try{bd.releasePointerCapture(D.id)}catch(e){}D=null}
+bd.addEventListener("pointerdown",e=>{
+if(D||(e.pointerType==="mouse"&&e.button!==0))return;
+if(!G||G.over||G.s.turn!==G.me)return;const pr=$("#promo");if(pr&&!pr.hidden)return;
+const q=e.target.closest(".sq");if(!q)return;const i=+q.dataset.i,p=G.s.b[i];
+if(!p||p[0]!==G.me)return;
+if(G.sel!==null&&G.sel!==i&&moves(G.sel,i).length)return;
+const img=q.querySelector(".pc");if(!img)return;
+e.preventDefault();
+try{bd.setPointerCapture(e.pointerId)}catch(x){}
+const src=img.src;G.sel=i;render();
+const o=$(`.sq[data-i="${i}"] .pc`),w=(o||img).getBoundingClientRect().width||48;
+const g=document.createElement("img");g.src=src;g.draggable=false;
+g.style.cssText="position:fixed;z-index:9999;pointer-events:none;width:"+(w*1.12)+"px;height:auto;transform:translate(-50%,"+(e.pointerType==="touch"?"-85%":"-50%")+");filter:drop-shadow(0 6px 8px rgba(0,0,0,.5))";
+document.body.appendChild(g);
+D={i,g,id:e.pointerId,x:e.clientX,y:e.clientY,moved:false};
+if(o)o.style.opacity=".3";place(e.clientX,e.clientY)});
+bd.addEventListener("pointermove",e=>{if(!D||e.pointerId!==D.id)return;
+if(Math.abs(e.clientX-D.x)+Math.abs(e.clientY-D.y)>6)D.moved=true;place(e.clientX,e.clientY)});
+bd.addEventListener("pointerup",e=>{if(!D||e.pointerId!==D.id)return;
+const from=D.i,moved=D.moved;stop();if(!moved)return;
+sup=true;setTimeout(()=>{sup=false},60);
+const el=document.elementFromPoint(e.clientX,e.clientY),t=el&&el.closest?el.closest(".sq"):null;
+if(!t||!G||G.over||G.s.turn!==G.me)return;const j=+t.dataset.i;if(j===from)return;
+const ms=moves(from,j);if(ms.length>1)promo(ms);else if(ms.length===1)move(ms[0])});
+bd.addEventListener("pointercancel",e=>{if(D&&e.pointerId===D.id)stop()});
+bd.addEventListener("click",e=>{if(sup){e.stopImmediatePropagation();e.preventDefault()}},true);
+})();
 function pcH(c,t){return`<img class="pc ${c==="w"?"pcw":"pcb"}" src="piezas/${c}${t}.png" alt="" draggable="false">`}
 function promo(ms){const d=$("#promo div");d.innerHTML=ms.map((m,i)=>`<button data-j="${i}">${pcH(G.me,m.p||"P")}</button>`).join("");
 $("#promo").className=$("#bd").className;$("#promo").hidden=false;d.onclick=e=>{const b=e.target.closest("button");if(!b)return;$("#promo").hidden=true;move(ms[+b.dataset.j])}}
